@@ -1,0 +1,21 @@
+N=20000 D=128 queries=200 k=10
+
+PQ trained+encoded in 16.7s
+HNSW built in 173.6s  (levels=5, edges=284405)
+
+system                         recall@10  ms/query      QPS  Mflop/q flop cut  memory MB
+1. Brute force (exact)             1.000     16.34       61     2.56     1.0x       10.2
+2. PQ (ADC scan)                   0.409      6.12      163     0.35     7.3x        0.5
+3. HNSW (exact dists)              1.000      3.61      277     0.04    57.0x       11.4
+4. PQ + HNSW                       0.409      3.19      313     0.04    67.1x        1.6
+2b. PQ + exact rerank*             0.986      5.93      168     0.37     7.0x       10.7
+4b. PQ+HNSW + exact rerank*        0.986      3.62      276     0.05    49.4x       11.8
+* rerank keeps raw vectors in memory, so no memory saving.
+
+HNSW ef_search sweep (recall vs speed):
+   ef | HNSW recall     ms | PQ+HNSW recall     ms
+   16 |       0.987   1.24 |          0.410   0.95
+   32 |       1.000   1.84 |          0.410   2.03
+   64 |       1.000   2.64 |          0.409   3.13
+  128 |       1.000   4.35 |          0.409   4.18
+  256 |       1.000   8.04 |          0.409   7.70
